@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <!-- Ustawienia strony - kodowanie znaków i responsywność -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Podłączenie plików ze stylami wizualnymi -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/all.min.css">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="static/fonts.css">
+
+    <!-- Tytuł strony wyświetlany w zakładce przeglądarki -->
+    <title>Strona Oficera</title>
+
+    <style>
+        /* ===== PRZYCISK UWAG ===== */
+        /* Pływający przycisk w lewym dolnym rogu ekranu */
+        .feedback-btn {
+            position: fixed;
+            bottom: 100px;
+            left: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            border: 2px solid #4a90e2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 9998;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(74, 144, 226, 0.3);
+        }
+
+        /* Ikona wewnątrz przycisku uwag */
+        .feedback-btn i {
+            color: #b1b1b4;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Animacja po najechaniu myszką na przycisk */
+        .feedback-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(175, 182, 190, 0.6);
+            border-color: #5dade2;
+        }
+
+        /* Animacja ikony po najechaniu myszką */
+        .feedback-btn:hover i {
+            color: #5dade2;
+            transform: rotate(15deg);
+        }
+
+        /* ===== OKNO MODALNE DO WYSYŁANIA UWAG ===== */
+        /* Ciemne tło zasłaniające stronę, gdy otwarte jest okno z formularzem */
+        .feedback-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Klasa aktywująca widoczność okna modalnego */
+        .feedback-modal.active {
+            display: flex;
+        }
+
+        /* Główne okno z formularzem */
+        .feedback-content {
+            background: linear-gradient(135deg, rgba(44, 62, 80, 0.95) 0%, rgba(52, 73, 94, 0.95) 100%);
+            border: 2px solid #4a90e2;
+            border-radius: 15px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 0 40px rgba(74, 144, 226, 0.5);
+            position: relative;
+        }
+
+        /* Nagłówek okna z tytułem i przyciskiem zamknięcia */
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #4a90e2;
+        }
+
+        /* Tytuł w nagłówku okna */
+        .feedback-header h2 {
+            color: #4a90e2;
+            font-size: 1.5rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Przycisk "X" do zamykania okna */
+        .feedback-close {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Animacja przycisku zamknięcia po najechaniu */
+        .feedback-close:hover {
+            color: #c0392b;
+            transform: rotate(90deg);
+        }
+
+        /* ===== FORMULARZ UWAG ===== */
+        /* Układ pionowy pól formularza */
+        .feedback-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Pojedyncze pole formularza (etykieta + input) */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        /* Etykiety nad polami formularza */
+        .form-group label {
+            color: #ecf0f1;
+            font-weight: bold;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Wszystkie pola do wpisywania tekstu */
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #4a90e2;
+            border-radius: 5px;
+            padding: 0.8rem;
+            color: #bbb7b3;
+            font-family: 'Oswald';
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        /* Efekt świecenia po kliknięciu w pole */
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #e4c1b3;
+            box-shadow: 0 0 10px rgba(74, 144, 226, 0.5);
+            background: rgba(204, 195, 195, 0.15);
+        }
+
+        /* Pole tekstowe wieloliniowe */
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: inherit;
+        }
+
+        /* Lista rozwijana */
+        .form-group select {
+            cursor: pointer;
+        }
+
+        /* Przycisk wysyłania formularza */
+        .submit-btn {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 1rem;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        /* Animacja przycisku wysyłania po najechaniu */
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(74, 144, 226, 0.5);
+            background: linear-gradient(135deg, #5dade2 0%, #4a90e2 100%);
+        }
+
+        /* Przycisk w stanie wciśnięcia */
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* ===== RESPONSYWNOŚĆ - DOSTOSOWANIE DO TELEFONÓW ===== */
+        /* Zmiany dla ekranów mniejszych niż 768px (telefony) */
+        @media (max-width: 768px) {
+            .feedback-btn {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                left: 20px;
+            }
+
+            .feedback-btn i {
+                font-size: 1.2rem;
+            }
+
+            .feedback-content {
+                padding: 1.5rem;
+            }
+
+            .feedback-header h2 {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* ===== PASEK INFORMACYJNY Z PRZEWIJANYMI WIADOMOŚCIAMI ===== */
+        /* Kontener na pasek informacyjny na dole strony */
+        .news-ticker-container {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            border-top: 2px solid #ffffff;
+            border-bottom: 2px solid #ffffff;
+            overflow: hidden;
+            position: relative;
+            height: 45px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Napis "AKTUALNOŚCI" z lewej strony paska */
+        .news-ticker-container::before {
+            content: 'AKTUALNOŚCI';
+            position: absolute;
+            left: 0;
+            background: #bf0b14;
+            color: #fff;
+            padding: 0 20px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            z-index: 2;
+            box-shadow: 3px 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Kontener na przewijające się wiadomości */
+        .news-ticker {
+            width: 100%;
+            padding-left: 150px;
+            overflow: hidden;
+        }
+
+        /* Zawartość paska z animacją przewijania */
+        .news-ticker-content {
+            display: flex;
+            animation: scroll-news 60s linear infinite;
+            white-space: nowrap;
+        }
+
+        /* Duplikowanie zawartości dla ciągłej pętli */
+        .news-ticker-content::after {
+            content: attr(data-content);
+        }
+
+        /* Pojedyncza wiadomość w pasku */
+        .news-item {
+            color: #e0e0e0;
+            padding: 0 50px;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Ikona przy wiadomości */
+        .news-item i {
+            color: #51ca00;
+            font-size: 1rem;
+        }
+
+        /* Animacja przewijania wiadomości */
+        @keyframes scroll-news {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Zatrzymanie animacji po najechaniu myszką */
+        .news-ticker-container:hover .news-ticker-content {
+            animation-play-state: paused;
+        }
+
+        /* Responsywność paska informacyjnego */
+        @media (max-width: 768px) {
+            .news-ticker-container {
+                height: 40px;
+            }
+
+            .news-ticker-container::before {
+                font-size: 0.75rem;
+                padding: 0 15px;
+            }
+
+            .news-ticker {
+                padding-left: 130px;
+            }
+
+            .news-item {
+                font-size: 0.85rem;
+                padding: 0 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ===== PRZYCISK OTWIERAJĄCY FORMULARZ UWAG ===== -->
+    <!-- Kolorowe koło w lewym dolnym rogu do zgłaszania opinii -->
+    <div class="feedback-btn" id="feedbackBtn">
+        <i class="fas fa-comment-dots"></i>
+    </div>
+
+    <!-- ===== OKNO MODALNE Z FORMULARZEM UWAG ===== -->
+    <!-- Ukryte okno, które pojawia się po kliknięciu przycisku uwag -->
+    <div class="feedback-modal" id="feedbackModal">
+        <div class="feedback-content">
+            <!-- Nagłówek z tytułem i przyciskiem zamknięcia -->
+            <div class="feedback-header">
+                <h2>System Uwag</h2>
+                <button class="feedback-close" id="feedbackClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Formularz do wypełnienia przez użytkownika -->
+            <form class="feedback-form" id="feedbackForm">
+                <!-- Pole: Stopień / Imię i Nazwisko -->
+                <div class="form-group">
+                    <label for="userName">Stopień / Imię i Nazwisko</label>
+                    <input type="text" id="userName" required placeholder="np. mjr Jan Kowalski">
+                </div>
+
+                <!-- Pole: Kategoria uwagi (lista rozwijana) -->
+                <div class="form-group">
+                    <label for="category">Kategoria</label>
+                    <select id="category" required>
+                        <option value="">-- Wybierz kategorię --</option>
+                        <option value="Błąd">Błąd</option>
+                        <option value="Sugestia">Sugestia</option>
+                        <option value="Inne">Inne</option>
+                    </select>
+                </div>
+
+                <!-- Pole: Opis uwagi (wieloliniowe) -->
+                <div class="form-group">
+                    <label for="description">Opis uwagi</label>
+                    <textarea id="description" required placeholder="Opisz szczegółowo swoją uwagę..."></textarea>
+                </div>
+
+                <!-- Przycisk wysyłający formularz -->
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Wyślij uwagę
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== OKNO POWITALNE Z OSTRZEŻENIEM ===== -->
+    <!-- Modal wyświetlający się przy pierwszym wejściu na stronę -->
+    <div id="welcomeModal" class="komunikat">
+        <div class="komunikat-content">
+            <!-- Nagłówek ostrzeżenia z ikoną -->
+            <div class="komunikat-header">
+                <i class="fas fa-exclamation-triangle warning-icon"></i>
+                <h2>Uwaga</h2>
+            </div>
+
+            <!-- Treść ostrzeżenia o bezpieczeństwie danych -->
+            <div class="komunikat-body">
+                <p>Dostęp do narzędzia ENWS obejmuje przetwarzanie danych osobowych oraz
+                    innych, zastrzeżonych informacji. Zachowaj poufność informacji.<br>
+                    Nie udostępniaj ich osobom nieuprawnionym. Przestsrzegaj wytycznych<br> w zakresie systemów
+                    bezpieczeństwa przy korzystaniu z narzędzia. Zabezpiecz urządzenie przed nieautoryzowanym dostępem.
+                    W razie wykrycia nieprawidłowości lub podejrzeń naruszenia bezpieczeństwa poufności informacji
+                    niezwłocznie zgłoś incydent lokalnemu administratorowi systemów teleinformatycznych</p>
+            </div>
+
+            <!-- Przycisk potwierdzenia zapoznania się z treścią -->
+            <div class="komunikat-footer">
+                <button id="acknowledgeButton">Zapoznałem się</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== GŁÓWNA NAWIGACJA STRONY ===== -->
+    <!-- Pasek menu na górze strony -->
+    <nav class="nawigacja">
+        <!-- Logo i nazwa jednostki -->
+        <div class="logo-container">
+            <div class="logo">
+                <img src="img/logo%20Elblag.png" alt="logo">
+            </div>
+            <div class="nazwa">
+                <p>Oddział ŻW w Elblągu</p>
+            </div>
+        </div>
+
+        <!-- Główna lista menu -->
+        <ul class="mainlist">
+            <!-- ===== MENU PROCEDURY ===== -->
+            <!-- Rozwijane menu z procedurami -->
+            <li>
+                <a href="#" class="procedury"><i class="fas fa-list-check"></i> procedury</a>
+
+                <!-- Podmenu z kategoriami procedur -->
+                <div class="submenu">
+                    <section class="mega-box">
+                        <!-- Logo w submenu -->
+                        <div class="row">
+                            <img src="img/zwlogo.png" alt="ŻW">
+                        </div>
+
+                        <!-- Kategoria: Naruszenia systemu JW -->
+                        <div class="row">
+                            <header>Naruszenia systemu JW</header>
+                            <ul class="list">
+                                <li><a href="procedures/ujawnienie mw w jw.html" target="_blank">Ujawnienie MW w JW</a></li>
+                                <li><a href="procedures/wtargnięcie.html">Wtargnięcia</a></li>
+                                <li><a href="procedures/DRON.html" target="_blank">DRON</a></li>
+                                <li><a href="procedures/REJESTROWANIE_JW.html" target="_blank">REJESTROWANIE JW</a></li>
+                                <li><a href="procedures/ŚNP.html" target="_blank">PROCEDURA ŚNP</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Kategoria: Zdarzenia Prewencyjne -->
+                        <div class="row">
+                            <header>Zdarzenia Prewencyjne</header>
+                            <ul class="list">
+                                <li><a href="procedures/przyjęcie zgłoszenia.html" target="_blank">Przyjęcie zgłoszenia</a></li>
+                                <li><a href="procedures/kolizja.html" target="_blank">Kolizja (WPM,PPM)</a></li>
+                                <li><a href="procedures/żołnierz w stanie nietrzeźwości.html" target="_blank">Stan nietrzeźwości w JW</a></li>
+                                <li><a href="procedures/interwencja domowa OD.html" target="_blank">Interwencja domowa OD</a></li>
+                                <li><a href="procedures/interwencja domowa - dca.html" target="_blank">Interwencja domowa d-ca patrolu</a></li>
+                                <li><a href="procedures/niekontrolowany.html" target="_blank">Niekontrolowany strzał</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Kategoria: Działalność bieżąca -->
+                        <div class="row">
+                            <header>Działalność bieżąca</header>
+                            <ul class="list">
+                                <li><a href="procedures/sprawdzenie przed służbą.html" target="_blank">Sprawdzenie przed służbą</a></li>
+                                <li><a href="procedures/harmonogram pełnienia.html" target="_blank">Harmonogram pełnienia</a></li>
+                                <li><a href="procedures/sprawozdawczosc.html" target="_blank">Sprawozdawczość</a></li>
+                            </ul>
+                        </div>
+
+                        <!-- Kategoria: Inne -->
+                        <div class="row">
+                            <header>Inne</header>
+                            <ul class="list">
+                                <li><a href="procedures/sytuacja szczegolna pkw.html" target="_blank">Sytuacja szczególna PKW</a></li>
+                                <li><a href="procedures/samowolne oddalenie.html" target="_blank">Samowolne oddalenie z bronią</a></li>
+                                <li><a href="procedures/śmierć żołnierza.html" target="_blank">Śmierć żołnierza</a></li>
+                                <li><a href="procedures/zaginięcie żołnierza.html" target="_blank">Zaginięcie żołnierza</a></li>
+                                <li><a href="procedures/SAMOBÓJSTWO - ZGŁOSZENIE JW.html" target="_blank">Samobójstwo - Zgłoszenie JW</a></li>
+                                <li><a href="procedures/SAMOBÓJSTWO - ZGŁOSZENIE OSOBA.html" target="_blank">Samobójstwo - Zgłoszenie OSOBA</a></li>
+                                <li><a href="procedures/harmonogram OGDPD przez OŻW.html" target="_blank">harmonogram OGDPD przez OŻW</a></li>
+                            </ul>
+                        </div>
+                    </section>
+                </div>
+            </li>
+
+            <!-- ===== MENU SYGNAŁY ===== -->
+            <!-- Rozwijane menu z sygnałami -->
+            <li class="signals">
+                <a href="#" class="signals-link"><i class="fas fa-pager"></i> sygnały</a>
+
+                <!-- Lista wszystkich sygnałów -->
+                <ul class="mysignals">
+                    <li><a href="signals/stopień alfa.html" target="_blank">ALFA</a></li>
+                    <li><a href="signals/stopień alfa crp.html" target="_blank">ALFA CRP</a></li>
+                    <li><a href="signals/BLOKADA 9 BKPanc.html" target="_blank">Blokada 9BKPanc</a></li>
+                    <li><a href="signals/stopień bravo.html" target="_blank">BRAVO</a></li>
+                    <li><a href="signals/stopień bravo crp.html" target="_blank">BRAVO CRP</a></li>
+                    <li><a href="signals/Burza 121.html" target="_blank">Burza 121</a></li>
+                    <li><a href="signals/stopień charlie.html" target="_blank">CHARLIE</a></li>
+                    <li><a href="signals/stopień charlie crp.html" target="_blank">CHARLIE CRP</a></li>
+                    <li><a href="signals/Dekret.html" target="_blank">Dekret</a></li>
+                    <li><a href="signals/stopień delta.html" target="_blank">DELTA</a></li>
+                    <li><a href="signals/stopień delta crp.html" target="_blank">DELTA CRP</a></li>
+                    <li><a href="signals/STRUMIEŃ.html" target="_blank">Egida</a></li>
+                    <li><a href="signals/Ewakuacja Materiałów Niejawnych z WCR.html" target="_blank">Ewakuacja WCR</a></li>
+                    <li><a href="signals/EMCON.html" target="_blank">EMCON</a></li>
+                    <li><a href="signals/Gryf.html" target="_blank">Gryf</a></li>
+                    <li><a href="signals/Gryf 1.html" target="_blank">Gryf 1</a></li>
+                    <li><a href="signals/Gryf 2.html" target="_blank">Gryf 2</a></li>
+                    <li><a href="signals/Gryf 3.html" target="_blank">Gryf 3</a></li>
+                    <li><a href="signals/Gryf 4.html" target="_blank">Gryf 4</a></li>
+                    <li><a href="signals/HALA 121.html" target="_blank">Hala 121</a></li>
+                    <li><a href="signals/heban.html" target="_blank">Heban</a></li>
+                    <li><a href="signals/jest dobrze.html" target="_blank">Jest Dobrze</a></li>
+                    <li><a href="signals/JW 3411 Prosi o pomoc.html" target="_blank">JW 2411 Pomoc</a></li>
+                    <li><a href="signals/kometa.html" target="_blank">Kometa</a></li>
+                    <li><a href="signals/Kontra 1.html" target="_blank">Kontra 1</a></li>
+                    <li><a href="signals/KONTRA 2.html" target="_blank">Kontra 2</a></li>
+                    <li><a href="signals/Kontusz.html" target="_blank">Kontusz</a></li>
+                    <li><a href="signals/KRYZYS.html" target="_blank">Kryzys</a></li>
+                    <li><a href="signals/KRYZYS 1.html" target="_blank">Kryzys 1</a></li>
+                    <li><a href="signals/KRYZYS 2.html" target="_blank">Kryzys 2</a></li>
+                    <li><a href="signals/KRYZYS 3.html" target="_blank">Kryzys 3</a></li>
+                    <li><a href="signals/KRYZYS 121.html" target="_blank">Kryzys 121</a></li>
+                    <li><a href="signals/MAGAZYN.html" target="_blank">Magazyn</a></li>
+                    <li><a href="signals/NAPAD.html" target="_blank">Napad</a></li>
+                    <li><a href="signals/Planeta.html" target="_blank">Planeta</a></li>
+                    <li><a href="signals/POMOC 22 WOG.html" target="_blank">Pomoc 22 WOG</a></li>
+                    <li><a href="signals/POWOŁANIE.html" target="_blank">Powołanie</a></li>
+                    <li><a href="signals/POWIEW.html" target="_blank">Powiew</a></li>
+                    <li><a href="signals/PROTON 100.html" target="_blank">Proton 100</a></li>
+                    <li><a href="signals/REGULACJA.html" target="_blank">Regulacja</a></li>
+                    <li><a href="signals/RENEGADE 1.html" target="_blank">Renegade 1</a></li>
+                    <li><a href="signals/RENEGADE 2.html" target="_blank">Renegade 2</a></li>
+                    <li><a href="signals/121.html" target="_blank">Sygnał 121</a></li>
+                    <li><a href="signals/STOPIEŃ 1500.html" target="_blank">Stopień 1500</a></li>
+                    <li><a  href="signals/TAJFUN.html" target="_blank">Tajfun</a></li>
+                    <li><a href="signals/TRASA.html" target="_blank">Trasa</a></li>
+                    <li><a href="signals/TUNEL 1.html" target="_blank">Tunel 1</a></li>
+                    <li><a href="signals/TUNEL 2.html" target="_blank">Tunel 2</a></li>
+                    <li><a href="signals/TUNEL 3.html" target="_blank">Tunel 3</a></li>
+                    <li><a href="signals/TUNEL 4.html" target="_blank">Tunel 4</a></li>
+                    <li><a href="signals/TUNEL 16.html" target="_blank">Tunel 16</a></li>
+                    <li><a href="signals/UWAGA ZAGROŻENIE 22BLT.html" target="_blank">Zagrożenie 22BLT</a></li>
+                    <li><a href="signals/UWAGA ZAGROŻENIE WCR Malbork.html" target="_blank">Zagrożenie WCR Malbork</a></li>
+                    <li><a href="signals/UZUPEŁNIENIE.html" target="_blank">Uzupełnienie</a></li>
+                    <li><a href="signals/WTARGNIĘCIE.html" target="_blank">Wtargnięcie</a></li>
+                    <li><a href="signals/wylew121.html" target="_blank">Wylew 121</a></li>
+                    <li><a href="signals/ZAGROŻENIE JW 2039.html" target="_blank">Zagrożenie JW 2039</a></li>
+                    <li><a href="signals/ZATOKA.html" target="_blank">Zatoka</a></li>
+                    <li><a href="signals/ZESPÓŁ TROTYL.html" target="_blank">Zespół Trotyl</a></li>
+                    <li><a href="signals/ZESPÓŁ TROTYL ĆWICZENIA.html" target="_blank">Zespół Trotyl Ćwiczenia</a></li>
+                    <li><a href="signals/ŻANDARM 121.html" target="_blank">Żandarm 121</a></li>
+                </ul>
+            </li>
+
+            <!-- ===== POZOSTAŁE LINKI W MENU ===== -->
+            <!-- Link do strony z garnizonami -->
+            <li><a href="GARNIZONY.html"><i class="fas fa-map-location-dot"></i>garnizony</a></li>
+
+            <!-- Link do rejonów odpowiedzialności -->
+            <li><a href="REJONY ODPOWIEDZIALNOŚCI.html">
+                    <i class="fa-solid fa-earth-americas"></i>rejony odpowiedzialności
+                </a></li>
+
+            <!-- Link do kontaktów -->
+            <!-- Link do kancelarii / generowania dokumentów -->
+            <li><a href="kancelaria.html" target="_blank"><i class="fas fa-file-pen"></i>kancelaria</a></li>
+
+            <!-- Link do kontaktów -->
+            <li><a href="kontakty/kontakty2.html"><i class="fas fa-phone"></i>kontakty</a></li>
+            <!-- ===== WYSZUKIWARKA W MENU ===== -->
+            <!-- Pole wyszukiwania procedur i sygnałów -->
+            <li>
+                <div class="wyszukiwarka">
+                    <button type="button" id="searchBtn"><i class="fas fa-magnifying-glass"></i></button>
+                    <input type="text" id="searchInput" placeholder="szukaj">
+
+                    <!-- Okno z wynikami wyszukiwania -->
+                    <div class="search-cloud" id="searchCloud">
+                        <button class="close-button" id="closeSearch"><i class="fa-solid fa-square-xmark"></i></button>
+                        <div id="searchResults"></div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- ===== ANIMOWANE TŁO ===== -->
+    <!-- Sekcja z filmem w tle strony głównej -->
+    <main>
+        <section class="animowane-tlo">
+            <video autoplay muted loop playsinline>
+                <source src="img/intro.mp4" type="video/mp4">
+            </video>
+        </section>
+    </main>
+
+    <!-- ===== PASEK INFORMACYJNY ===== -->
+    <!-- Przewijające się wiadomości na dole strony -->
+    <div class="news-ticker-container">
+        <div class="news-ticker">
+            <div class="news-ticker-content">
+                <span class="news-item"><i class="fa-solid fa-arrow-up-right-from-square"></i> Pamiętaj o ewidencjownowaniu wszystkich czynności w Dzienniku Działań OD</span>
+                <span class="news-item"><i class="fa-solid fa-arrow-up-right-from-square"></i> Sprawdź zabezpieczenie pomieszczeń i garaży po godzinach służbowych i w dni wolne</span>
+                <span class="news-item"><i class="fa-solid fa-arrow-up-right-from-square"></i> Pamiętaj o czynnościach OD inicjujących czynności w ramach GMiB</span>
+                <span class="news-item"><i class="fa-solid fa-arrow-up-right-from-square"></i> Aktualizuj rozliczenie bojowe OŻW w dniu objęcia służby.</span>
+                <span class="news-item"><i class="fa-solid fa-arrow-up-right-from-square"></i> Sposoby alarmowania: WARIANT I KTSA/ WARIANT II a] telefonia stacjonarna/komórkowa b] łącznicy po kadrę</span>
+                <span class="news-item"><i class="fa-solid fa-arrow-up-right-from-square"></i> Pamiętaj o konsultowaniu meldunków bieżących z Szefem WDŚ (w razie potrzeb)</span>
+                <span class="news-item"><i class="fa-solid fa-arrow-up-right-from-square"></i> W przypadku otrzymania informacji o śmierci żołnierza obligatryjnie wykonaj telefon do Komendanta</span>
+                <span class="news-item"><i class="fa-solid fa-arrow-up-right-from-square"></i> Sprawdź wygląd żołnierzy na służbie</span>
+                <span class="news-item"><i class="fa-solid fa-arrow-up-right-from-square"></i> Sprawdź obowiązujące stopnie gotowości bojowej i zagrożenia terrorystycznego</span>
+                <span class="news-item"><i class="fa-solid fa-arrow-up-right-from-square"></i> Rozlicz dokumentacją sporządzoną podczas służby przez pomocnika OD</span>
+                <span class="news-item"><i class="fa-solid fa-arrow-up-right-from-square"></i> W razie potrzeb dokonaj kontroli patroli</span>
+                <span class="news-item"><i class="fa-solid fa-arrow-up-right-from-square"></i> Pamiętaj o realizacji zadań w ramach programu "Zero Tolerancji"</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== STOPKA STRONY ===== -->
+    <!-- Informacje o autorach i wersji na dole strony -->
+    <footer>
+        <div>
+            <div class="zegar"></div>
+        </div>
+        <p>© mjr Kamil Nazaruk, mjr Tomasz Nazaruk, 2025 r. ver. 3.0.</p>
+    </footer>
+
+    <!-- ===== SKRYPTY JAVASCRIPT ===== -->
+    <script>
+        // ========== SYSTEM UWAG ==========
+        // Pobieranie elementów formularza uwag
+        const feedbackBtn = document.getElementById('feedbackBtn');
+        const feedbackModal = document.getElementById('feedbackModal');
+        const feedbackClose = document.getElementById('feedbackClose');
+        const feedbackForm = document.getElementById('feedbackForm');
+
+        // Otwieranie okna z formularzem uwag
+        feedbackBtn.addEventListener('click', function() {
+            feedbackModal.classList.add('active');
+        });
+
+        // Zamykanie okna przez przycisk X
+        feedbackClose.addEventListener('click', function() {
+            feedbackModal.classList.remove('active');
+        });
+
+        // Zamykanie okna przez kliknięcie w ciemne tło
+        feedbackModal.addEventListener('click', function(e) {
+            if (e.target === feedbackModal) {
+                feedbackModal.classList.remove('active');
+            }
+        });
+
+        // Zamykanie okna klawiszem ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && feedbackModal.classList.contains('active')) {
+                feedbackModal.classList.remove('active');
+            }
+        });
+
+        // Obsługa wysyłania formularza - generowanie pliku TXT
+        feedbackForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Zatrzymanie standardowego wysyłania formularza
+
+            // Pobranie wartości z pól formularza
+            const userName = document.getElementById('userName').value;
+            const category = document.getElementById('category').value;
+            const description = document.getElementById('description').value;
+            const currentDate = new Date().toLocaleString('pl-PL');
+
+            // Tworzenie zawartości pliku tekstowego
+            const fileContent = `
+===============================================
+SYSTEM UWAG - ENWS
+===============================================
+
+Data zgłoszenia: ${currentDate}
+Zgłaszający: ${userName}
+Kategoria: ${category}
+
+-----------------------------------------------
+OPIS UWAGI:
+-----------------------------------------------
+
+${description}
+
+===============================================
+Koniec zgłoszenia
+===============================================
+            `.trim();
+
+            // Tworzenie pliku do pobrania
+            const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            // Generowanie nazwy pliku z aktualną datą
+            const fileName = `uwaga_${new Date().getTime()}.txt`;
+            link.href = url;
+            link.download = fileName;
+
+            // Automatyczne pobieranie pliku
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            // Wyświetlenie komunikatu o powodzeniu
+            alert('✅ Uwaga została zapisana!\n\nPlik został pobrany. Prosimy o umieszczenie go w folderze "remarks" w katalogu głównym systemu.');
+
+            // Czyszczenie formularza i zamknięcie okna
+            feedbackForm.reset();
+            feedbackModal.classList.remove('active');
+        });
+
+        // ========== MODAL POWITALNY ==========
+        // Obsługa okna ostrzegawczego wyświetlanego przy pierwszym wejściu
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('welcomeModal');
+            const acknowledgeButton = document.getElementById('acknowledgeButton');
+
+            // Funkcja otwierająca modal
+            function openModal() {
+                modal.style.display = 'block';
+            }
+
+            // Funkcja zamykająca modal i zapisująca informację w sesji
+            function closeModal() {
+                modal.style.display = 'none';
+                sessionStorage.setItem('modalAcknowledged', 'true');
+            }
+
+            // Sprawdzenie czy użytkownik już potwierdził zapoznanie się
+            const isAcknowledged = sessionStorage.getItem('modalAcknowledged');
+
+            // Jeśli nie potwierdził, pokaż modal
+            if (!isAcknowledged) {
+                openModal();
+            }
+
+            // Obsługa przycisku potwierdzenia
+            acknowledgeButton.addEventListener('click', closeModal);
+        });
+
+        // ========== PRZYCISK PROCEDURY ==========
+        // Obsługa rozwijalnego menu z procedurami
+        const procedury = document.querySelector(".procedury");
+        const submenu = document.querySelector(".submenu");
+
+        // Funkcja przełączająca widoczność podmenu
+        function SubMenu(event) {
+            event.preventDefault();
+            submenu.classList.toggle('active');
+
+            // Blokowanie przewijania strony gdy menu otwarte
+            if (submenu.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+
+                // Dodanie przycisku zamykania X
+                if (!document.querySelector('.submenu-close')) {
+                    const closeBtn = document.createElement('button');
+                    closeBtn.className = 'submenu-close';
+                    closeBtn.innerHTML = '✕';
+                    closeBtn.onclick = closeSubmenu;
+                    submenu.appendChild(closeBtn);
+                }
+            } else {
+                document.body.style.overflow = 'hidden';
+
+                // Usunięcie przycisku zamykania
+                const closeBtn = document.querySelector('.submenu-close');
+                if (closeBtn) closeBtn.remove();
+            }
+        }
+
+        // Funkcja zamykająca submenu
+        function closeSubmenu() {
+            submenu.classList.remove('active');
+            document.body.style.overflow = 'hidden';
+
+            const closeBtn = document.querySelector('.submenu-close');
+            if (closeBtn) closeBtn.remove();
+        }
+
+        // Funkcja ukrywająca submenu po kliknięciu poza nim
+        function hideSubMenu(event) {
+            // Ignoruj kliknięcie w przycisk zamknięcia
+            if (event.target.classList.contains('submenu-close')) {
+                return;
+            }
+
+            // Zamknij gdy kliknięto poza submenu i przyciskiem procedury
+            if (!submenu.contains(event.target) && !procedury.contains(event.target)) {
+                closeSubmenu();
+            }
+
+            // Zamknij po kliknięciu w link w submenu
+            if (event.target.tagName === 'A' && submenu.contains(event.target)) {
+                closeSubmenu();
+            }
+        }
+
+        // Zamknięcie submenu klawiszem ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && submenu.classList.contains('active')) {
+                closeSubmenu();
+            }
+        });
+
+        // Podpięcie nasłuchiwaczy
+        procedury.addEventListener('click', SubMenu);
+        document.addEventListener('click', hideSubMenu);
+
+        // ========== PRZYCISK SYGNAŁY ==========
+        // Obsługa rozwijalnego menu z sygnałami
+        const signalsLink = document.querySelector('.signals-link');
+        const submenuSignals = document.querySelector('.mysignals');
+
+        // Funkcja przełączająca widoczność menu sygnałów
+        function toggleMenu(event) {
+            event.preventDefault();
+            submenuSignals.classList.toggle('active');
+        }
+
+        // Funkcja ukrywająca menu po kliknięciu poza nim
+        function hideMenu(event) {
+            if (!submenuSignals.contains(event.target) && !signalsLink.contains(event.target)) {
+                submenuSignals.classList.remove('active');
+            }
+        }
+
+        // Podpięcie nasłuchiwaczy
+        signalsLink.addEventListener('click', toggleMenu);
+        document.addEventListener('click', hideMenu);
+
+        // ========== WYSZUKIWARKA ==========
+        // Pobieranie elementów wyszukiwarki
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const searchCloud = document.getElementById('searchCloud');
+        const searchResults = document.getElementById('searchResults');
+        const closeSearch = document.getElementById('closeSearch');
+
+        // ===== BAZA DANYCH DO WYSZUKIWANIA =====
+        // Wszystkie elementy do przeszukania (procedury + sygnały)
+        const searchableItems = [
+            // ============ PROCEDURY ============
+            // Kategoria: Naruszenia systemu JW
+            { name: 'Ujawnienie MW w JW', url: 'procedures/ujawnienie mw w jw.html', category: 'Procedury - Naruszenia systemu JW' },
+            { name: 'Wtargnięcia', url: 'procedures/wtargnięcie.html', category: 'Procedury - Naruszenia systemu JW' },
+            { name: 'DRON', url: 'procedures/DRON.html', category: 'Procedury - Naruszenia systemu JW' },
+            { name: 'Rejestrowanie JW', url: 'procedures/REJESTROWANIE_JW.html', category: 'Procedury - Naruszenia systemu JW' },
+            { name: 'Procedura ŚNP', url: 'procedures/ŚNP.html', category: 'Procedury - Naruszenia systemu JW' },
+
+            // Kategoria: Zdarzenia Prewencyjne
+            { name: 'Przyjęcie zgłoszenia', url: 'procedures/przyjęcie zgłoszenia.html', category: 'Procedury - Zdarzenia Prewencyjne' },
+            { name: 'Kolizja (WPM,PPM)', url: 'procedures/kolizja.html', category: 'Procedury - Zdarzenia Prewencyjne' },
+            { name: 'Stan nietrzeźwości w JW', url: 'procedures/żołnierz w stanie nietrzeźwości.html', category: 'Procedury - Zdarzenia Prewencyjne' },
+            { name: 'Interwencja domowa OD', url: 'procedures/interwencja domowa OD.html', category: 'Procedury - Zdarzenia Prewencyjne' },
+            { name: 'Interwencja domowa d-ca patrolu', url: 'procedures/interwencja domowa - dca.html', category: 'Procedury - Zdarzenia Prewencyjne' },
+            { name: 'Niekontrolowany strzał', url: 'procedures/niekontrolowany.html', category: 'Procedury - Zdarzenia Prewencyjne' },
+
+            // Kategoria: Działalność bieżąca
+            { name: 'Sprawdzenie przed służbą', url: 'procedures/sprawdzenie przed służbą.html', category: 'Procedury - Działalność bieżąca' },
+            { name: 'Harmonogram pełnienia', url: 'procedures/harmonogram pełnienia.html', category: 'Procedury - Działalność bieżąca' },
+            { name: 'Sprawozdawczość', url: 'procedures/sprawozdawczosc.html', category: 'Procedury - Działalność bieżąca' },
+
+            // Kategoria: Inne
+            { name: 'Sytuacja szczególna PKW', url: 'procedures/sytuacja szczegolna pkw.html', category: 'Procedury - Inne' },
+            { name: 'Samowolne oddalenie z bronią', url: 'procedures/samowolne oddalenie.html', category: 'Procedury - Inne' },
+            { name: 'Śmierć żołnierza', url: 'procedures/śmierć żołnierza.html', category: 'Procedury - Inne' },
+            { name: 'Zaginięcie żołnierza', url: 'procedures/zaginięcie żołnierza.html', category: 'Procedury - Inne' },
+            { name: 'Samobójstwo - Zgłoszenie JW', url: 'procedures/SAMOBÓJSTWO - ZGŁOSZENIE JW.html', category: 'Procedury - Inne' },
+            { name: 'Samobójstwo - Zgłoszenie OSOBA', url: 'procedures/SAMOBÓJSTWO - ZGŁOSZENIE OSOBA.html', category: 'Procedury - Inne' },
+            { name: 'Harmonogram OGDPD przez OŻW', url: 'procedures/harmonogram OGDPD przez OŻW.html', category: 'Procedury - Inne' },
+
+            // ============ SYGNAŁY ============
+            { name: 'ALFA', url: 'signals/stopień alfa.html', category: 'Sygnały' },
+            { name: 'ALFA CRP', url: 'signals/stopień alfa crp.html', category: 'Sygnały' },
+            { name: 'Blokada 9BKPanc', url: 'signals/BLOKADA 9 BKPanc.html', category: 'Sygnały' },
+            { name: 'BRAVO', url: 'signals/stopień bravo.html', category: 'Sygnały' },
+            { name: 'BRAVO CRP', url: 'signals/stopień bravo crp.html', category: 'Sygnały' },
+            { name: 'Burza 121', url: 'signals/Burza 121.html', category: 'Sygnały' },
+            { name: 'CHARLIE', url: 'signals/stopień charlie.html', category: 'Sygnały' },
+            { name: 'CHARLIE CRP', url: 'signals/stopień charlie crp.html', category: 'Sygnały' },
+            { name: 'Dekret', url: 'signals/Dekret.html', category: 'Sygnały' },
+            { name: 'DELTA', url: 'signals/stopień delta.html', category: 'Sygnały' },
+            { name: 'DELTA CRP', url: 'signals/stopień delta crp.html', category: 'Sygnały' },
+            { name: 'Egida (Strumień)', url: 'signals/STRUMIEŃ.html', category: 'Sygnały' },
+            { name: 'Ewakuacja WCR', url: 'signals/Ewakuacja Materiałów Niejawnych z WCR.html', category: 'Sygnały' },
+            { name: 'EMCON', url: 'signals/EMCON.html', category: 'Sygnały' },
+            { name: 'Gryf', url: 'signals/Gryf.html', category: 'Sygnały' },
+            { name: 'Gryf 1', url: 'signals/Gryf 1.html', category: 'Sygnały' },
+            { name: 'Gryf 2', url: 'signals/Gryf 2.html', category: 'Sygnały' },
+            { name: 'Gryf 3', url: 'signals/Gryf 3.html', category: 'Sygnały' },
+            { name: 'Gryf 4', url: 'signals/Gryf 4.html', category: 'Sygnały' },
+            { name: 'Hala 121', url: 'signals/HALA 121.html', category: 'Sygnały' },
+            { name: 'Heban', url: 'signals/heban.html', category: 'Sygnały' },
+            { name: 'Jest Dobrze', url: 'signals/jest dobrze.html', category: 'Sygnały' },
+            { name: 'JW 2411 Pomoc', url: 'signals/JW 3411 Prosi o pomoc.html', category: 'Sygnały' },
+            { name: 'Kometa', url: 'signals/kometa.html', category: 'Sygnały' },
+            { name: 'Kontra 1', url: 'signals/Kontra 1.html', category: 'Sygnały' },
+            { name: 'Kontra 2', url: 'signals/KONTRA 2.html', category: 'Sygnały' },
+            { name: 'Kontusz', url: 'signals/Kontusz.html', category: 'Sygnały' },
+            { name: 'Kryzys', url: 'signals/KRYZYS.html', category: 'Sygnały' },
+            { name: 'Kryzys 1', url: 'signals/KRYZYS 1.html', category: 'Sygnały' },
+            { name: 'Kryzys 2', url: 'signals/KRYZYS 2.html', category: 'Sygnały' },
+            { name: 'Kryzys 3', url: 'signals/KRYZYS 3.html', category: 'Sygnały' },
+            { name: 'Kryzys 121', url: 'signals/KRYZYS 121.html', category: 'Sygnały' },
+            { name: 'Magazyn', url: 'signals/MAGAZYN.html', category: 'Sygnały' },
+            { name: 'Napad', url: 'signals/NAPAD.html', category: 'Sygnały' },
+            { name: 'Planeta', url: 'signals/Planeta.html', category: 'Sygnały' },
+            { name: 'Pomoc 22 WOG', url: 'signals/POMOC 22 WOG.html', category: 'Sygnały' },
+            { name: 'Powołanie', url: 'signals/POWOŁANIE.html', category: 'Sygnały' },
+            { name: 'Powiew', url: 'signals/POWIEW.html', category: 'Sygnały' },
+            { name: 'Proton 100', url: 'signals/PROTON 100.html', category: 'Sygnały' },
+            { name: 'Regulacja', url: 'signals/REGULACJA.html', category: 'Sygnały' },
+            { name: 'Renegade 1', url: 'signals/RENEGADE 1.html', category: 'Sygnały' },
+            { name: 'Renegade 2', url: 'signals/RENEGADE 2.html', category: 'Sygnały' },
+            { name: 'Sygnał 121', url: 'signals/121.html', category: 'Sygnały' },
+            { name: 'Stopień 1500', url: 'signals/STOPIEŃ 1500.html', category: 'Sygnały' },
+            { name: 'Tajfun', url: 'signals/TAJFUN.html', category: 'Sygnały' },
+            { name: 'Trasa', url: 'signals/TRASA.html', category: 'Sygnały' },
+            { name: 'Tunel 1', url: 'signals/TUNEL 1.html', category: 'Sygnały' },
+            { name: 'Tunel 2', url: 'signals/TUNEL 2.html', category: 'Sygnały' },
+            { name: 'Tunel 3', url: 'signals/TUNEL 3.html', category: 'Sygnały' },
+            { name: 'Tunel 4', url: 'signals/TUNEL 4.html', category: 'Sygnały' },
+            { name: 'Tunel 16', url: 'signals/TUNEL 16.html', category: 'Sygnały' },
+            { name: 'Zagrożenie 22BLT', url: 'signals/UWAGA ZAGROŻENIE 22BLT.html', category: 'Sygnały' },
+            { name: 'Zagrożenie WCR Malbork', url: 'signals/UWAGA ZAGROŻENIE WCR Malbork.html', category: 'Sygnały' },
+            { name: 'Uzupełnienie', url: 'signals/UZUPEŁNIENIE.html', category: 'Sygnały' },
+            { name: 'Wtargnięcie', url: 'signals/WTARGNIĘCIE.html', category: 'Sygnały' },
+            { name: 'Wylew 121', url: 'signals/wylew121.html', category: 'Sygnały' },
+            { name: 'Zagrożenie JW 2039', url: 'signals/ZAGROŻENIE JW 2039.html', category: 'Sygnały' },
+            { name: 'Zatoka', url: 'signals/ZATOKA.html', category: 'Sygnały' },
+            { name: 'Zespół Trotyl', url: 'signals/ZESPÓŁ TROTYL.html', category: 'Sygnały' },
+            { name: 'Zespół Trotyl Ćwiczenia', url: 'signals/ZESPÓŁ TROTYL ĆWICZENIA.html', category: 'Sygnały' },
+            { name: 'Żandarm 121', url: 'signals/ŻANDARM 121.html', category: 'Sygnały' }
+        ];
+
+        // Główna funkcja wyszukiwania
+        function performSearch() {
+            // Pobranie wpisanego tekstu i zamiana na małe litery
+            const query = searchInput.value.trim().toLowerCase();
+
+            // Jeśli pole puste, ukryj wyniki
+            if (query.length === 0) {
+                searchCloud.style.display = 'none';
+                return;
+            }
+
+            // Filtrowanie elementów pasujących do zapytania
+            const results = searchableItems.filter(item =>
+                item.name.toLowerCase().includes(query)
+            );
+
+            // Wyświetlanie wyników lub komunikatu o braku wyników
+            if (results.length === 0) {
+                searchResults.innerHTML = '<p style="color: #999; text-align: center; padding: 2rem;">Nie znaleziono wyników</p>';
+            } else {
+                let html = '<h3 style="margin-bottom: 1rem; color: grey;">Wyniki wyszukiwania:</h3>';
+
+                // Grupowanie wyników według kategorii
+                const groupedResults = results.reduce((acc, item) => {
+                    if (!acc[item.category]) acc[item.category] = [];
+                    acc[item.category].push(item);
+                    return acc;
+                }, {});
+
+                // Tworzenie HTML dla każdej kategorii
+                for (const [category, items] of Object.entries(groupedResults)) {
+                    html += `<div style="margin-bottom: 1.5rem;">
+                        <h4 style="color: #fff; margin-bottom: 0.5rem; font-size: 1.1rem;">${category}</h4>
+                        <ul style="list-style: none; padding: 0;">`;
+
+                    // Dodawanie każdego znalezionego elementu jako link
+                    items.forEach(item => {
+                        html += `<li style="margin-bottom: 0.5rem;">
+                            <a href="${item.url}" target="_blank" style="color: #e0e0e0; text-decoration: none; display: block; padding: 0.5rem; border-radius: 5px; transition: all 0.2s;"
+                               onmouseover="this.style.backgroundColor='rgba(191, 11, 20, 0.2)'; this.style.color='#fff';"
+                               onmouseout="this.style.backgroundColor='transparent'; this.style.color='#e0e0e0';">
+                               ${item.name}
+                            </a>
+                        </li>`;
+                    });
+
+                    html += '</ul></div>';
+                }
+
+                // Wstawienie wygenerowanego HTML
+                searchResults.innerHTML = html;
+            }
+
+            // Pokazanie okna z wynikami
+            searchCloud.style.display = 'block';
+        }
+
+        // Wyszukiwanie po kliknięciu przycisku
+        searchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            performSearch();
+        });
+
+        // Wyszukiwanie po naciśnięciu Enter
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch();
+            }
+        });
+
+        // Wyszukiwanie na bieżąco podczas wpisywania
+        searchInput.addEventListener('input', function() {
+            if (searchInput.value.trim().length > 0) {
+                performSearch();
+            } else {
+                searchCloud.style.display = 'none';
+            }
+        });
+
+        // Zamknięcie okna wyników po kliknięciu przycisku X
+        closeSearch.addEventListener('click', function() {
+            searchCloud.style.display = 'none';
+            searchInput.value = '';
+        });
+
+        // Zamknięcie okna wyników po kliknięciu poza nim
+        document.addEventListener('click', function(e) {
+            if (!searchCloud.contains(e.target) &&
+                !searchInput.contains(e.target) &&
+                !searchBtn.contains(e.target)) {
+                searchCloud.style.display = 'none';
+            }
+        });
+
+        // Zamknięcie okna wyników klawiszem ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && searchCloud.style.display === 'block') {
+                searchCloud.style.display = 'none';
+                searchInput.value = '';
+            }
+        });
+    </script>
+
+    <!-- Podłączenie zewnętrznego pliku JavaScript -->
+    <script src="js/p24.js"></script>
+</body>
+
+</html>

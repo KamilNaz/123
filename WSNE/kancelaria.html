@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kancelaria – ENWS</title>
+  <link rel="stylesheet" href="css/fontawesome.min.css">
+  <link rel="stylesheet" href="css/all.min.css">
+  <link rel="stylesheet" href="static/fonts.css">
+  <link rel="stylesheet" href="style.css">
+  <script src="js/pdf.js"></script>
+  <script src="js/jspdf.umd.min.js"></script>
+  <script src="js/jspdf.plugin.autotable.min.js"></script>
+
+  
+</head>
+<body>
+
+<!-- ── NAGŁÓWEK ── -->
+<header>
+  <div class="header-left">
+    <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Powrót</a>
+    <div class="header-title"><i class="fas fa-file-pen"></i> Stwórz Dokument</div>
+  </div>
+</header>
+
+<!-- ── APP BODY ── -->
+<div class="app-body">
+
+  <!-- ── SIDEBAR ── -->
+  <nav class="sidebar">
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title"><i class="fas fa-tower-broadcast"></i> Meldunki</div>
+      <div class="sidebar-item" id="openMeldunek">
+        <i class="fas fa-flag"></i> Meldunek bieżący
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title"><i class="fas fa-clipboard-list"></i> Sprawozdania</div>
+      <div class="sidebar-item disabled">
+        <i class="fas fa-shield-halved"></i> Sprawozdanie operacyjne
+      </div>
+    </div>
+
+  </nav>
+
+  <!-- ── CONTENT ── -->
+  <main class="content">
+    <div class="content-placeholder">
+      <div class="big-icon"><i class="fas fa-file-pen"></i></div>
+      <h2>Wybierz dokument</h2>
+      <p>Wybierz rodzaj dokumentu z panelu po lewej stronie, aby wypełnić formularz i wygenerować PDF.</p>
+    </div>
+  </main>
+
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  © mjr Kamil Nazaruk, mjr Tomasz Nazaruk, 2026 r. &nbsp;|&nbsp; ENWS ver. 3.0
+</footer>
+
+<!-- ══════════════════════════════════
+     MODAL – MELDUNEK BIEŻĄCY
+══════════════════════════════════ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+
+    <div class="modal-header">
+      <div class="modal-title"><i class="fas fa-flag"></i> Meldunek bieżący</div>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- 1. DANE DOKUMENTU -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="fas fa-file-lines"></i> Dane dokumentu</div>
+        <div class="form-row third">
+          <div class="form-group">
+            <label class="fg-label">Numer meldunku</label>
+            <input type="number" id="nrMeldunku" placeholder="np. 31" min="1">
+          </div>
+          <div class="form-group">
+            <label class="fg-label">Data sporządzenia</label>
+            <input type="date" id="dataMeldunku">
+          </div>
+          <div class="form-group">
+            <label class="fg-label">Miejscowość</label>
+            <input type="text" id="miejscowosc" value="Elbląg">
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="fg-label">Oficer Dyżurny (OD)</label>
+            <select id="oficerDyzurny">
+              <option value="">-- Wybierz OD --</option>
+              <option>sierż. Adam Kowalski</option>
+              <option>sierż. Piotr Wiśniewski</option>
+              <option>sierż. Marek Zając</option>
+              <option>sierż. Tomasz Lewandowski</option>
+              <option>sierż. Krzysztof Wójcik</option>
+              <option>st. sierż. Andrzej Nowak</option>
+              <option>st. sierż. Michał Krawczyk</option>
+              <option>st. sierż. Rafał Mazur</option>
+              <option>st. sierż. Łukasz Dąbrowski</option>
+              <option>st. sierż. Grzegorz Piotrowski</option>
+              <option>sierż. szt. Bartosz Jankowski</option>
+              <option>sierż. szt. Paweł Szymański</option>
+              <option>sierż. szt. Kamil Woźniak</option>
+              <option>sierż. szt. Damian Kozłowski</option>
+              <option>sierż. szt. Mariusz Wojciechowski</option>
+              <option>mł. chor. Arkadiusz Grabowski</option>
+              <option>mł. chor. Szymon Nowakowski</option>
+              <option>mł. chor. Dariusz Pawlak</option>
+              <option>mł. chor. Jacek Michalski</option>
+              <option>mł. chor. Robert Czarnecki</option>
+              <option>chor. Przemysław Walczak</option>
+              <option>chor. Krzysztof Kubiak</option>
+              <option>chor. Zbigniew Kaczmarek</option>
+              <option>st. chor. Ryszard Adamski</option>
+              <option>st. chor. Henryk Bąk</option>
+              <option>ppor. Mateusz Olszewski</option>
+              <option>ppor. Sławomir Błaszczyk</option>
+              <option>ppor. Łukasz Górski</option>
+              <option>ppor. Konrad Pietrzak</option>
+              <option>ppor. Tomasz Wróbel</option>
+              <option>por. Marcin Zawadzki</option>
+              <option>por. Piotr Majewski</option>
+              <option>por. Dawid Sikora</option>
+              <option>por. Artur Stępień</option>
+              <option>por. Łukasz Ostrowski</option>
+              <option>kpt. Jarosław Kłos</option>
+              <option>kpt. Grzegorz Lis</option>
+              <option>kpt. Norbert Kalinowski</option>
+              <option>kpt. Sebastian Wieczorek</option>
+              <option>kpt. Radosław Zielński</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. ZDARZENIE -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="fas fa-circle-exclamation"></i> Zdarzenie</div>
+        <div class="form-row third">
+          <div class="form-group">
+            <label class="fg-label">Data zdarzenia</label>
+            <input type="date" id="dataZdarzenia">
+          </div>
+          <div class="form-group">
+            <label class="fg-label">Godzina zdarzenia</label>
+            <input type="time" id="godzinaZdarzenia">
+          </div>
+          <div class="form-group">
+            <label class="fg-label">Miejsce zdarzenia</label>
+            <input type="text" id="miejsceZdarzenia" placeholder="np. 9 BKPanc, Braniewo">
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="fg-label">Kategoria Zdarzenia według Katalogu Zdarzeń</label>
+            <select id="kategoriaZdarzenia">
+              <option value="">-- Wybierz kategorię --</option>
+              <option>kolizja drogowa wpm/ppm (kat. I/1)</option>
+              <option>wypadek drogowy wpm/ppm (kat. I/2)</option>
+              <option>wypadek drogowy z udziałem pojazdów wojskowych i cywilnych (kat. I/3)</option>
+              <option>śmierć żołnierza – naturalna (kat. I/4N)</option>
+              <option>śmierć żołnierza – nagła/niewyjaśniona (kat. I/4NN)</option>
+              <option>śmierć żołnierza – wypadek (kat. I/4W)</option>
+              <option>śmierć żołnierza – samobójstwo (kat. I/4S)</option>
+              <option>zaginięcie żołnierza (kat. I/5)</option>
+              <option>wypadek lotniczy (kat. I/6)</option>
+              <option>wypadek przy użyciu uzbrojenia/sprzętu wojskowego (kat. I/7)</option>
+              <option>samookaleczenie żołnierza (kat. I/8)</option>
+              <option>wtargnięcie na teren JW (kat. II/1)</option>
+              <option>rejestrowanie obiektu JW (kat. II/2)</option>
+              <option>niekontrolowany lot BSP nad terenem JW (kat. II/3)</option>
+              <option>działania rozpoznawcze przeciwko obiektom wojskowym (kat. III/4)</option>
+              <option>kradzież mienia wojskowego (kat. II/5K)</option>
+              <option>zniszczenie mienia wojskowego (kat. II/5Z)</option>
+              <option>samowolne oddalenie żołnierza (kat. II/6)</option>
+              <option>samowolne oddalenie żołnierza z bronią (kat. II/6B)</option>
+              <option>niekontrolowany strzał (kat. II/7)</option>
+              <option>stan nietrzeźwości żołnierza w miejscu służby (kat. II/8A)</option>
+              <option>stan nietrzeźwości żołnierza poza służbą (kat. II/8B)</option>
+              <option>naruszenie przepisów o środkach odurzających (kat. II/9)</option>
+              <option>pobicie/bójka z udziałem żołnierza (kat. II/10)</option>
+              <option>interwencja domowa z udziałem żołnierza (kat. II/11)</option>
+              <option>popełnienie innego czynu zabronionego przez personel RON, szczególnie w stanie nietrzeźwości lub odurzenia (kat.II/14N)</option>
+              <option>inne zdarzenie prewencyjne (kat. II/14)</option>
+              <option>zdarzenie z udziałem żołnierzy sił sojuszniczych (kat. III/1)</option>
+              <option>naruszenie przepisów o ochronie informacji niejawnych (kat. III/2)</option>
+              <option>próba samobójcza żołnierza (kat. III/3)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. DANE SPRAWCY -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="fas fa-user-shield"></i> Dane sprawcy / uczestnika</div>
+        <div class="form-row" style="grid-template-columns:1fr 1fr 1fr 1fr">
+          <div class="form-group">
+            <label class="fg-label">Stopień / Status</label>
+            <select id="stopienSprawcy">
+              <option value="">-- Wybierz --</option>
+              <optgroup label="Szeregowi">
+                <option>szer.</option><option>st. szer.</option>
+              </optgroup>
+              <optgroup label="Podoficerowie">
+                <option>kpr.</option><option>kpr. pchor.</option><option>st. kpr.</option>
+                <option>plut.</option><option>st. plut.</option><option>sierż.</option>
+                <option>st. sierż.</option><option>sierż. szt.</option><option>mł. chor.</option>
+                <option>chor.</option><option>st. chor.</option><option>chor. szt.</option>
+              </optgroup>
+              <optgroup label="Oficerowie">
+                <option>ppor.</option><option>por.</option><option>kpt.</option>
+                <option>mjr.</option><option>ppłk.</option><option>płk.</option>
+                <option>gen. bryg.</option><option>gen. dyw.</option><option>gen. broni</option><option>gen.</option>
+              </optgroup>
+              <optgroup label="Inne">
+                <option>pracownik RON</option><option>osoba cywilna</option><option>NN</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="fg-label">Imię</label>
+            <input type="text" id="imieSprawcy" placeholder="np. Jan">
+          </div>
+          <div class="form-group">
+            <label class="fg-label">Nazwisko</label>
+            <input type="text" id="nazwiskoSprawcy" placeholder="np. KOWALSKI">
+          </div>
+          <div class="form-group">
+            <label class="fg-label">Imię ojca</label>
+            <input type="text" id="imieOjcaSprawcy" placeholder="np. Andrzej">
+          </div>
+        </div>
+        <div class="form-row third">
+          <div class="form-group">
+            <label class="fg-label">Jednostka wojskowa</label>
+            <select id="jednostkaSprawcy">
+              <option value="">-- Wybierz JW --</option>
+              <optgroup label="Brygady pancerne / zmechanizowane">
+                <option>9 Brygada Kawalerii Pancernej – Braniewo</option>
+                <option>15 Brygada Zmechanizowana – Giżycko</option>
+                <option>16 Dywizja Zmechanizowana – Olsztyn</option>
+                <option>20 Brygada Zmechanizowana – Bartoszyce</option>
+              </optgroup>
+              <optgroup label="Lotnictwo">
+                <option>22 Baza Lotnictwa Taktycznego – Malbork</option>
+                <option>23 Baza Lotnictwa Taktycznego – Mińsk Mazowiecki</option>
+              </optgroup>
+              <optgroup label="Marynarka Wojenna">
+                <option>3 Flotylla Okrętów – Gdynia</option>
+                <option>8 Flotylla Obrony Wybrzeża – Świnoujście</option>
+              </optgroup>
+              <optgroup label="Obrona Terytorialna">
+                <option>2 WBOTiO – Białystok</option>
+                <option>3 WBOTiO – Lublin</option>
+                <option>4 WBOTiO – Gliwice</option>
+                <option>5 WBOTiO – Kraków</option>
+                <option>6 WBOTiO – Kraków</option>
+                <option>8 WBOTiO – Zielona Góra</option>
+              </optgroup>
+              <optgroup label="Wsparcie / zabezpieczenie">
+                <option>1 Batalion Logistyczny – Elbląg</option>
+                <option>Pułk Ochrony – Elbląg</option>
+                <option>Centrum Szkolenia Logistyki – Grudziądz</option>
+              </optgroup>
+              <optgroup label="Podległe MON">
+                <option>Dowództwo Operacyjne RSZ – Warszawa</option>
+                <option>Dowództwo Generalne RSZ – Warszawa</option>
+                <option>Dowództwo Wojsk Obrony Terytorialnej – Warszawa</option>
+                <option>Centrum Operacji Powietrznych – Warszawa</option>
+                <option>Centrum Operacji Morskich – Gdynia</option>
+                <option>Dowództwo Garnizonu Warszawa – Warszawa</option>
+                <option>Komenda Główna Żandarmerii Wojskowej – Warszawa</option>
+                <option>Dowództwo Komponentu Wojsk Obrony Cyberprzestrzeni – Warszawa</option>
+                <option>Agencja Wywiadu Wojskowego – Warszawa</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="fg-label">Miejscowość JW</label>
+            <select id="miejscowoscJW">
+              <option value="">-- Wybierz --</option>
+              <option>Bartoszyce</option><option>Białystok</option><option>Braniewo</option>
+              <option>Elbląg</option><option>Gdańsk</option><option>Gdynia</option>
+              <option>Giżycko</option><option>Grudziądz</option><option>Iława</option>
+              <option>Kraków</option><option>Malbork</option><option>Morąg</option>
+              <option>Olsztyn</option><option>Szczecin</option><option>Warszawa</option>
+              <option>Wrocław</option><option>Inne</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="fg-label">Podległość JW</label>
+            <select id="podlegloscJW">
+              <option value="">-- Wybierz --</option>
+              <optgroup label="Dowódca Generalny RSZ">
+                <option>DG RSZ</option>
+              </optgroup>
+              <optgroup label="Dowódca Operacyjny RSZ">
+                <option>DO RSZ</option>
+              </optgroup>
+              <optgroup label="Wojska Lądowe">
+                <option>11 LDKPanc</option><option>12 DZ</option><option>16 DZ</option>
+                <option>18 DZ</option><option>1 BPanc</option><option>10 BKPanc</option>
+              </optgroup>
+              <optgroup label="Siły Powietrzne">
+                <option>COP-DKP</option><option>1 BLTaktyczne</option><option>2 BLTaktyczne</option>
+              </optgroup>
+              <optgroup label="Marynarka Wojenna">
+                <option>COM-DKM</option><option>3 FO</option><option>8 FOW</option>
+              </optgroup>
+              <optgroup label="WOT">
+                <option>DWOT</option>
+              </optgroup>
+              <optgroup label="Bezpośrednio MON">
+                <option>DGRSZ</option><option>DORSZ</option><option>DWOT</option>
+                <option>DGW</option><option>KGŻW</option><option>DKWOC</option>
+                <option>Agencja Wywiadu Wojskowego</option>
+                <option>Centrum Weterana Działań poza Granicami Kraju</option>
+                <option>Wojskowe Centrum Aktywności Społecznej</option>
+                <option>Akademia Wojsk Lądowych – Wrocław</option>
+                <option>Akademia Sztuki Wojennej – Warszawa</option>
+                <option>Wojskowa Akademia Techniczna – Warszawa</option>
+              </optgroup>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. OPIS ZDARZENIA -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="fas fa-file-alt"></i> Opis zdarzenia</div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="fg-label">Krótki opis zdarzenia</label>
+            <textarea id="opisZdarzenia" placeholder="Opisz zdarzenie..." style="min-height:100px"></textarea>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="fg-label">Kwalifikacja prawna czynu</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+              <input type="text" id="kwalSearch" placeholder="🔍 Szukaj w artykułach..." style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-size:13px" oninput="filterKwal(this.value)">
+            </div>
+            <select id="kwalifikacjaSelect" size="5" style="width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:4px;font-size:12px">
+              <option value="">-- brak / nie dotyczy --</option>
+              <option>art. 178a § 1 k.k. – prowadzenie pojazdu w stanie nietrzeźwości</option>
+              <option>art. 178a § 4 k.k. – prowadzenie pojazdu w stanie nietrzeźwości (recydywa)</option>
+              <option>art. 87 § 1 k.w. – prowadzenie pojazdu po użyciu alkoholu (wykroczenie)</option>
+              <option>art. 279 § 1 k.k. – kradzież z włamaniem</option>
+              <option>art. 278 § 1 k.k. – kradzież</option>
+              <option>art. 278 § 5 k.k. – kradzież energii / karty uprawniającej do podjęcia pieniędzy</option>
+              <option>art. 280 § 1 k.k. – rozbój</option>
+              <option>art. 280 § 2 k.k. – rozbój z użyciem broni / niebezpiecznego narzędzia</option>
+              <option>art. 281 k.k. – kradzież rozbójnicza</option>
+              <option>art. 157 § 1 k.k. – spowodowanie średniego uszczerbku na zdrowiu</option>
+              <option>art. 157 § 2 k.k. – spowodowanie lekkiego uszczerbku na zdrowiu</option>
+              <option>art. 158 § 1 k.k. – udział w bójce lub pobiciu</option>
+              <option>art. 158 § 2 k.k. – bójka/pobicie ze skutkiem ciężkiego uszkodzenia ciała</option>
+              <option>art. 190 § 1 k.k. – groźba karalna</option>
+              <option>art. 190a § 1 k.k. – stalking</option>
+              <option>art. 197 § 1 k.k. – zgwałcenie</option>
+              <option>art. 197 § 3 pkt 2 k.k. – zgwałcenie zbiorowe</option>
+              <option>art. 198 k.k. – seksualne wykorzystanie osoby bezradnej/niepoczytalnej</option>
+              <option>art. 199 § 1 k.k. – seksualne wykorzystanie zależności</option>
+              <option>art. 200 § 1 k.k. – seksualne wykorzystanie małoletniego poniżej 15 lat</option>
+              <option>art. 62 ust. 1 ustawy o przeciwdziałaniu narkomanii – posiadanie narkotyków</option>
+              <option>art. 62 ust. 2 ustawy o p.n. – posiadanie narkotyków w znacznej ilości</option>
+              <option>art. 59 ust. 1 ustawy o p.n. – udzielanie narkotyków</option>
+              <option>art. 288 § 1 k.k. – zniszczenie mienia</option>
+              <option>art. 193 k.k. – naruszenie miru domowego</option>
+              <option>art. 217 § 1 k.k. – naruszenie nietykalności cielesnej</option>
+              <option>art. 222 § 1 k.k. – naruszenie nietykalności funkcjonariusza</option>
+              <option>art. 224 § 2 k.k. – czynna napaść na funkcjonariusza</option>
+              <option>art. 343 k.k. – samowolne oddalenie się żołnierza (część wojskowa)</option>
+              <option>art. 344 k.k. – dezercja (część wojskowa)</option>
+              <option>art. 345 § 1 k.k. – znęcanie się nad podwładnym żołnierzem (część wojskowa)</option>
+              <option>art. 346 k.k. – samowolne naruszenie granic służby (część wojskowa)</option>
+              <option>art. 347 k.k. – nieposłuszeństwo wobec rozkazu (część wojskowa)</option>
+              <option>art. 350 k.k. – porzucenie stanowiska lub posterunku (część wojskowa)</option>
+              <option>art. 352 k.k. – tchórzostwo (część wojskowa)</option>
+              <option>art. 354 k.k. – samouszkodzenie w celu uchylenia od służby wojskowej (część wojskowa)</option>
+              <option>art. 356 k.k. – niszczenie / uszkadzanie sprzętu wojskowego (część wojskowa)</option>
+              <option>art. 359 k.k. – ujawnienie tajemnicy wojskowej (część wojskowa)</option>
+              <option>art. 296 § 1 k.k. – nadużycie zaufania (niegospodarność)</option>
+              <option>art. 231 § 1 k.k. – przekroczenie uprawnień przez funkcjonariusza publicznego</option>
+            </select>
+            <div style="margin-top:6px;display:flex;gap:8px;align-items:center">
+              <input type="text" id="kwalDodatkowe" placeholder="Lub wpisz ręcznie / uzupełnij..." style="flex:1;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-size:13px">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. LOS SPRAWCY -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="fas fa-person-walking-arrow-right"></i> Co się stało ze sprawcą / pokrzywdzonym</div>
+        <div class="check-grid" id="losSprawcyGrid">
+          <label class="check-item"><input type="checkbox" name="losSprawcy" value="Sprawca nie został ujawniony."><span class="checkmark"></span><span class="check-label">Sprawca nie został ujawniony</span></label>
+          <label class="check-item"><input type="checkbox" name="losSprawcy" value="Sprawca został ujawniony i wylegitymowany."><span class="checkmark"></span><span class="check-label">Sprawca ujawniony i wylegitymowany</span></label>
+          <label class="check-item"><input type="checkbox" name="losSprawcy" value="Sprawca został zatrzymany i przekazany Policji."><span class="checkmark"></span><span class="check-label">Sprawca zatrzymany i przekazany Policji</span></label>
+          <label class="check-item"><input type="checkbox" name="losSprawcy" value="Sprawca zbiegł z miejsca zdarzenia."><span class="checkmark"></span><span class="check-label">Sprawca zbiegł z miejsca zdarzenia</span></label>
+          <label class="check-item"><input type="checkbox" name="losSprawcy" value="Pokrzywdzonemu udzielono pomocy medycznej na miejscu."><span class="checkmark"></span><span class="check-label">Udzielono pomocy medycznej na miejscu</span></label>
+          <label class="check-item"><input type="checkbox" name="losSprawcy" value="Pokrzywdzony przewieziony do szpitala."><span class="checkmark"></span><span class="check-label">Pokrzywdzony przewieziony do szpitala</span></label>
+          <label class="check-item"><input type="checkbox" name="losSprawcy" value="Sprawca / pokrzywdzony trzeźwy."><span class="checkmark"></span><span class="check-label">Sprawca / pokrzywdzony trzeźwy</span></label>
+          <label class="check-item"><input type="checkbox" name="losSprawcy" value="Nie stwierdzono pokrzywdzonego."><span class="checkmark"></span><span class="check-label">Nie stwierdzono pokrzywdzonego</span></label>
+          <label class="check-item"><input type="checkbox" name="losSprawcy" value="Żołnierz odesłany do macierzystej jednostki."><span class="checkmark"></span><span class="check-label">Żołnierz odesłany do macierzystej jednostki</span></label>
+          <label class="check-item"><input type="checkbox" name="losSprawcy" value="Wobec sprawcy zastosowano środki przymusu bezpośredniego."><span class="checkmark"></span><span class="check-label">Zastosowano środki przymusu bezpośredniego</span></label>
+          <label class="check-item"><input type="checkbox" name="losSprawcy" value="Sprawca przekazany do dyspozycji Policji celem wytrzeźwienia."><span class="checkmark"></span><span class="check-label">Sprawca przekazany Policji (wytrzeźwienie)</span></label>
+          <label class="check-item"><input type="checkbox" name="losSprawcy" value="Sprawa skierowana do prokuratury."><span class="checkmark"></span><span class="check-label">Sprawa skierowana do prokuratury</span></label>
+        </div>
+        <div class="form-group" style="margin-top:8px">
+          <textarea id="losDodatkowe" placeholder="Opcjonalnie: dopisz dodatkowe informacje..."></textarea>
+        </div>
+      </div>
+
+      <!-- 6. TRZEŹWOŚĆ -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="fas fa-wine-bottle"></i> Stan trzeźwości</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="fg-label">Sprawca (dane osobowe)</label>
+            <input type="text" id="sprawcaTrzezwosc_dane" placeholder="np. mł. chor. Katarzyna KOWALSKA" style="margin-bottom:6px">
+            <label class="fg-label" style="margin-top:6px">Stan trzeźwości sprawcy</label>
+            <select id="trzezwoscSprawcy">
+              <option value="">-- Wybierz --</option>
+              <option>trzeźwy</option>
+              <option>po użyciu alkoholu</option>
+              <option>w stanie nietrzeźwości</option>
+              <option>po użyciu środków odurzających</option>
+              <option>nie badano</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="fg-label">Uczestnik zdarzenia (dane osobowe)</label>
+            <input type="text" id="uczestnikTrzezwosc_dane" placeholder="np. szer. Adam NOWAK" style="margin-bottom:6px">
+            <label class="fg-label" style="margin-top:6px">Stan trzeźwości uczestnika</label>
+            <select id="trzezwoscUczestnikow">
+              <option value="">-- Wybierz --</option>
+              <option>trzeźwy</option>
+              <option>po użyciu alkoholu</option>
+              <option>w stanie nietrzeźwości</option>
+              <option>po użyciu środków odurzających</option>
+              <option>nie badano</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. CZYNNOŚCI NA MIEJSCU ZDARZENIA -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="fas fa-list-check"></i> Czynności wykonane na miejscu zdarzenia</div>
+        <p style="color:var(--text-dim);font-size:12px;margin:0 0 10px">Możesz dodać wiele instytucji. Kliknij „+ Dodaj instytucję" aby dodać kolejną.</p>
+        <div id="instytucjeContainer">
+          <!-- Instytucja 1 -->
+          <div class="inst-block" data-idx="0">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <select class="inst-select" style="flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 10px;font-size:13px">
+                <option value="">-- Wybierz instytucję --</option>
+                <optgroup label="Żandarmeria Wojskowa">
+                  <option>OŻW w Elblągu</option><option>PŻW w Braniewie</option>
+                  <option>PŻW w Bartoszycach</option><option>PŻW w Malborku</option>
+                  <option>PŻW w Morągu</option><option>PŻW w Giżycku</option>
+                  <option>WŻW w Gdyni</option><option>WŻW w Bemowie Piskim</option>
+                  <option>WŻW w Olsztynie</option>
+                </optgroup>
+                <optgroup label="Policja / organy ścigania">
+                  <option>Komenda Miejska Policji</option><option>Komenda Powiatowa Policji</option>
+                  <option>OPP KWP w Gdańsku</option><option>OPP KWP w Olsztynie</option>
+                  <option>Prokuratura Wojskowa</option>
+                </optgroup>
+                <optgroup label="Inne służby">
+                  <option>Pogotowie Ratunkowe</option><option>Straż Pożarna</option>
+                  <option>Inspekcja Transportu Drogowego</option><option>Służba Dyżurna JW</option>
+                </optgroup>
+              </select>
+              <button type="button" onclick="removeInst(this)" style="background:var(--red,#e55);color:#fff;border:none;border-radius:6px;padding:7px 12px;cursor:pointer;font-size:13px">✕</button>
+            </div>
+            <div class="check-grid inst-checks">
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="dokonano sprawdzenia terenu przyległego do JW"><span class="checkmark"></span><span class="check-label">Sprawdzono teren przyległy do JW</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="dokonano oględzin terenu"><span class="checkmark"></span><span class="check-label">Dokonano oględzin terenu</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="dokonano oględzin pojazdu oraz jego odholowanie"><span class="checkmark"></span><span class="check-label">Oględziny pojazdu i odholowanie</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="zatrzymano prawo jazdy za pokwitowaniem"><span class="checkmark"></span><span class="check-label">Zatrzymano prawo jazdy</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="zatrzymano żołnierza"><span class="checkmark"></span><span class="check-label">Zatrzymano żołnierza</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="przeprowadzono badanie trzeźwości"><span class="checkmark"></span><span class="check-label">Badanie trzeźwości</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="przeprowadzono badanie na obecność środków odurzających"><span class="checkmark"></span><span class="check-label">Badanie na środki odurzające</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="przewieziono żołnierza do szpitala na badanie krwi pod kątem zawartości alkoholu oraz środków odurzających"><span class="checkmark"></span><span class="check-label">Przewiezienie do szpitala (badanie krwi)</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="rozpoznano świadków zdarzenia"><span class="checkmark"></span><span class="check-label">Rozpoznano świadków zdarzenia</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="ustalono dane osobowe uczestników zdarzenia"><span class="checkmark"></span><span class="check-label">Ustalono dane osobowe</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="wykonano dokumentację fotograficzną"><span class="checkmark"></span><span class="check-label">Dokumentacja fotograficzna</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="powiadomiono potwierdzono miejsca pełnienia służby"><span class="checkmark"></span><span class="check-label">Potwierdzono miejsce pełnienia służby</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="dokonano ustaleń w zakresie wyznaczenia żołnierza do pełnienia służby w JW"><span class="checkmark"></span><span class="check-label">Ustalenia – wyznaczenie żołnierza do służby</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="przekazano sprawę do dalszego prowadzenia właściwej jednostce"><span class="checkmark"></span><span class="check-label">Przekazano sprawę właściwej jednostce</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="powiadomiono Dyżurną Służbę Operacyjną ŻW"><span class="checkmark"></span><span class="check-label">Powiadomiono DSO ŻW</span></label>
+              <label class="check-item"><input type="checkbox" class="inst-czyn" value="powiadomiono Komendanta OŻW"><span class="checkmark"></span><span class="check-label">Powiadomiono Komendanta OŻW</span></label>
+            </div>
+            <div style="margin-top:6px">
+              <input type="text" class="inst-dop" placeholder="Dopisz inne czynności tej instytucji..." style="width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-size:13px">
+            </div>
+          </div>
+        </div>
+        <button type="button" id="btnDodajInst" onclick="addInst()" style="margin-top:10px;background:var(--blue);color:#fff;border:none;border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px">+ Dodaj instytucję</button>
+      </div>
+
+      <!-- 8. ŚRODKI PRZYMUSU -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="fas fa-handcuffs"></i> Zastosowane środki przymusu bezpośredniego</div>
+        <div class="check-grid">
+          <label class="check-item"><input type="checkbox" name="przymus" value="Nie stosowano środków przymusu bezpośredniego."><span class="checkmark"></span><span class="check-label">Nie stosowano</span></label>
+          <label class="check-item"><input type="checkbox" name="przymus" value="siła fizyczna"><span class="checkmark"></span><span class="check-label">Siła fizyczna</span></label>
+          <label class="check-item"><input type="checkbox" name="przymus" value="kajdanki"><span class="checkmark"></span><span class="check-label">Kajdanki</span></label>
+          <label class="check-item"><input type="checkbox" name="przymus" value="kajdanki założone z tyłu"><span class="checkmark"></span><span class="check-label">Kajdanki (z tyłu)</span></label>
+          <label class="check-item"><input type="checkbox" name="przymus" value="chemiczne środki obezwładniające (gaz)"><span class="checkmark"></span><span class="check-label">Środki chemiczne (gaz)</span></label>
+          <label class="check-item"><input type="checkbox" name="przymus" value="pałka służbowa"><span class="checkmark"></span><span class="check-label">Pałka służbowa</span></label>
+          <label class="check-item"><input type="checkbox" name="przymus" value="pies służbowy"><span class="checkmark"></span><span class="check-label">Pies służbowy</span></label>
+          <label class="check-item"><input type="checkbox" name="przymus" value="broń palna – oddanie strzału ostrzegawczego"><span class="checkmark"></span><span class="check-label">Strzał ostrzegawczy</span></label>
+        </div>
+        <div class="form-group" style="margin-top:8px">
+          <textarea id="przymusDodatkowe" placeholder="Uzupełnij szczegóły (np. kajdanki założono po stawianiu oporu, siłą fizyczną unieruchomiono na ziemi)..." style="min-height:60px"></textarea>
+        </div>
+      </div>
+
+      <!-- 9. DALSZE POSTĘPOWANIE -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="fas fa-road"></i> Sposób dalszego postępowania</div>
+        <div class="check-grid" style="margin-bottom:10px">
+          <label class="check-item"><input type="checkbox" name="postep" value="Zostanie przeprowadzone postępowanie przygotowawcze."><span class="checkmark"></span><span class="check-label">Postępowanie przygotowawcze</span></label>
+          <label class="check-item"><input type="checkbox" name="postep" value="Sporządzona zostanie notatka służbowa."><span class="checkmark"></span><span class="check-label">Notatka służbowa</span></label>
+          <label class="check-item"><input type="checkbox" name="postep" value="Przeprowadzone zostanie dochodzenie w trybie uproszczonym."><span class="checkmark"></span><span class="check-label">Dochodzenie uproszczone</span></label>
+          <label class="check-item"><input type="checkbox" name="postep" value="Sprawa zostanie umorzona z braku znamion czynu zabronionego."><span class="checkmark"></span><span class="check-label">Umorzenie (brak znamion czynu)</span></label>
+          <label class="check-item"><input type="checkbox" name="postep" value="Zostanie skierowany wniosek do rzecznika dyscyplinarnego."><span class="checkmark"></span><span class="check-label">Wniosek do rzecznika dyscyplinarnego</span></label>
+          <label class="check-item"><input type="checkbox" name="postep" value="Materiały przekazano do właściwej prokuratury."><span class="checkmark"></span><span class="check-label">Materiały do właściwej prokuratury</span></label>
+          <label class="check-item"><input type="checkbox" name="postep" value="Wszczęto postępowanie dyscyplinarne."><span class="checkmark"></span><span class="check-label">Postępowanie dyscyplinarne</span></label>
+          <label class="check-item"><input type="checkbox" name="postep" value="Sprawa zostanie przekazana do Wojskowego Centrum Aktywności Społecznej."><span class="checkmark"></span><span class="check-label">Wojskowe Centrum Aktywności Społecznej</span></label>
+          <label class="check-item"><input type="checkbox" name="postep" value="Dalsze czynności wykona właściwa terytorialnie placówka ŻW."><span class="checkmark"></span><span class="check-label">Właściwa terytorialnie placówka ŻW</span></label>
+          <label class="check-item"><input type="checkbox" name="postep" value="Zdarzenie nie wymaga dalszego postępowania."><span class="checkmark"></span><span class="check-label">Brak dalszego postępowania</span></label>
+        </div>
+        <div class="form-group">
+          <label class="fg-label">Kto prowadzi dalsze postępowanie</label>
+          <select id="dalszePosto">
+            <option value="">-- Wybierz --</option>
+            <optgroup label="Żandarmeria Wojskowa – OŻW/WŻW">
+              <option>OŻW w Elblągu</option>
+              <option>WŻW w Gdyni</option>
+              <option>WŻW w Bemowie Piskim</option>
+              <option>WŻW w Olsztynie</option>
+              <option>WŻW w Bydgoszczy</option>
+              <option>WŻW w Warszawie</option>
+            </optgroup>
+            <optgroup label="Placówki ŻW">
+              <option>PŻW w Braniewie</option>
+              <option>PŻW w Bartoszycach</option>
+              <option>PŻW w Malborku</option>
+              <option>PŻW w Morągu</option>
+              <option>PŻW w Giżycku</option>
+              <option>PŻW w Iławie</option>
+              <option>PŻW w Gdańsku</option>
+            </optgroup>
+            <optgroup label="Prokuratura">
+              <option>Prokuratura Wojskowa – Gdańsk</option>
+              <option>Prokuratura Wojskowa – Olsztyn</option>
+              <option>Prokuratura Regionalna – Gdańsk</option>
+            </optgroup>
+            <optgroup label="Policja">
+              <option>Policja – jednostka terytorialnie właściwa</option>
+            </optgroup>
+          </select>
+          <input type="text" id="dalszePostoDop" placeholder="Lub wpisz ręcznie..." style="margin-top:6px;width:100%;box-sizing:border-box;background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-size:13px">
+        </div>
+      </div>
+
+      <!-- 10. INNE UWAGI -->
+      <div class="form-section">
+        <div class="form-section-title"><i class="fas fa-comment-dots"></i> Inne uwagi</div>
+        <div class="form-row full">
+          <div class="form-group">
+            <textarea id="inneUwagi" placeholder="O zdarzeniu powiadomiono: ..."></textarea>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /modal-body -->
+
+
+    <div class="modal-footer">
+      <button class="btn-primary" id="btnGenerujPDF">
+        <i class="fas fa-file-pdf"></i> Generuj PDF
+      </button>
+    </div>
+
+  </div><!-- /modal -->
+</div><!-- /modal-overlay -->
+
+
+
+
+</body>
+</html>
